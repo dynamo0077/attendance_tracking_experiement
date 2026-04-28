@@ -7,131 +7,492 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
-      --bg:#ffffff;
-      --header:#1565c0;
-      --teal:#00897b;
-      --border:#d0d7de;
-      --text:#1f2937;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#152033;
       --muted:#6b7280;
-      --pending:#fff8e1;
-      --verified:#e6f4ea;
-      --absent:#ffffff;
-      --defaulter:#fce8e6;
-      --hover:#eaf4ff;
-      --shadow:0 8px 24px rgba(0,0,0,.08);
+      --border:#e5e7eb;
+      --primary:#2f6fed;
+      --primary-dark:#1f57cf;
+      --teal:#0f9d8a;
+      --green:#e8f5ea;
+      --yellow:#fff8df;
+      --shadow:0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius:18px;
     }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f6f8fb;color:var(--text)}
-    .topbar{background:var(--header);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-    .topbar .title{font-weight:700;letter-spacing:.2px}
-    .topbar .user{font-size:14px;opacity:.95}
-    .switch-link{color:#d7ecff;text-decoration:none;font-size:14px;margin-left:auto}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      background:linear-gradient(90deg, var(--primary), #2457c5);
+      color:#fff;
+      padding:18px 24px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      box-shadow:0 4px 14px rgba(0,0,0,.12);
+    }
+
+    .brand{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
+    .topbar .spacer{flex:1}
+    .user-info{font-size:14px;opacity:.96}
+    .switch-link{
+      color:#d9e8ff;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:600;
+    }
     .switch-link:hover{text-decoration:underline}
-    .wrap{max-width:1400px;margin:18px auto;padding:0 14px}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start}
-    .panel,.sidebar{background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
-    .panel-inner{padding:16px}
-    .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-bottom:14px}
-    .field{display:flex;flex-direction:column;gap:6px}
-    label{font-size:12px;color:var(--muted)}
-    select,input[type="number"],input[type="text"]{border:1px solid var(--border);border-radius:10px;padding:10px 12px;font:inherit;background:#fff;min-height:42px}
-    .grid-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:12px}
-    .attendance-grid{display:grid;min-width:max-content}
-    .cell,.rowhdr,.colhdr{border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;min-height:36px;display:flex;align-items:center;justify-content:center;padding:4px 6px;font-size:13px}
-    .rowhdr,.colhdr{background:#f8fafc;font-weight:600}
-    .rowhdr{justify-content:flex-start;min-width:160px;position:sticky;left:0;z-index:2}
-    .colhdr{min-width:34px;position:sticky;top:0;z-index:1}
-    .corner{background:#f8fafc;position:sticky;left:0;top:0;z-index:3;min-width:160px}
-    .cell{min-width:34px;cursor:pointer;user-select:none;background:var(--absent)}
-    .cell:hover{background:var(--hover)}
-    .cell.pending{background:var(--pending)}
-    .cell.verified{background:var(--verified)}
-    .status-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
-    .pending .status-dot{background:#f4c542}
-    .verified .status-dot{background:#34a853}
-    .absent .status-dot{background:#c7c7c7}
-    .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
-    .legend span{display:inline-flex;align-items:center;gap:6px}
-    .sidebar{background:var(--defaulter);border:1px solid #f5c2c0}
-    .sidebar h2{margin:0;padding:16px 16px 0;font-size:18px}
-    .sidebar-inner{padding:14px 16px 16px}
-    .badge-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-    .pill{background:#fff;border:1px solid #f0b8b2;border-radius:999px;padding:10px 12px;font-size:14px;display:flex;justify-content:space-between;gap:12px}
+
+    .wrap{
+      max-width:1500px;
+      margin:22px auto;
+      padding:0 18px 28px;
+    }
+
+    .dashboard-grid{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .main-col{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      min-width:0;
+    }
+
+    .sidebar{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:sticky;
+      top:18px;
+    }
+
+    .sidebar-head{
+      padding:18px 18px 10px;
+      background:#fdecec;
+      border-bottom:1px solid #f3c7c7;
+    }
+
+    .sidebar-head h2{
+      margin:0;
+      font-size:18px;
+    }
+
+    .sidebar-body{
+      padding:16px 18px 18px;
+    }
+
+    .pill-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .pill{
+      background:#fff;
+      border:1px solid #f1c1c1;
+      border-radius:999px;
+      padding:11px 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:14px;
+      box-shadow:0 2px 8px rgba(0,0,0,.03);
+    }
+
     .muted{color:var(--muted)}
-    .overlay{position:fixed;inset:0;background:rgba(255,255,255,.96);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .card-inner{
+      padding:18px;
+    }
+
+    .filters{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:end;
+      justify-content:space-between;
+    }
+
+    .filter-left,.filter-right{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:end;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:.02em;
+    }
+
+    select,input[type="number"],input[type="text"]{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 12px;
+      min-height:42px;
+      font:inherit;
+      background:#fff;
+      outline:none;
+    }
+
+    .btn{
+      border:0;
+      border-radius:12px;
+      padding:11px 14px;
+      min-height:42px;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark)}
+    .btn-soft{background:#eaf1ff;color:#1649ad}
+    .btn-teal{background:var(--teal);color:#fff}
+
+    .metrics{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .metric{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .metric .label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .metric .value{
+      margin-top:8px;
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+    }
+
+    .metric .sub{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .attendance-card .card-inner{
+      padding-top:12px;
+    }
+
+    .grid-wrap{
+      overflow:auto;
+      border:1px solid #e7ebf0;
+      border-radius:14px;
+    }
+
+    .attendance-grid{
+      display:grid;
+      min-width:max-content;
+      background:#fff;
+    }
+
+    .cell,.rowhdr,.colhdr{
+      border-right:1px solid #e7ebf0;
+      border-bottom:1px solid #e7ebf0;
+      min-height:36px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:4px 6px;
+      font-size:13px;
+    }
+
+    .rowhdr,.colhdr{
+      background:#f8fafc;
+      font-weight:700;
+    }
+
+    .rowhdr{
+      justify-content:flex-start;
+      min-width:170px;
+      position:sticky;
+      left:0;
+      z-index:2;
+    }
+
+    .colhdr{
+      min-width:34px;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    .corner{
+      background:#f8fafc;
+      position:sticky;
+      left:0;
+      top:0;
+      z-index:3;
+      min-width:170px;
+    }
+
+    .cell{
+      min-width:34px;
+      cursor:pointer;
+      user-select:none;
+      background:#fff;
+    }
+
+    .cell:hover{background:#edf5ff}
+    .cell.checked{background:#e8f5ea}
+    .cell.absent{background:#fff}
+
+    .checkbox-box{
+      width:16px;
+      height:16px;
+      border:2px solid #94a3b8;
+      border-radius:4px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:11px;
+      line-height:1;
+      color:#fff;
+      background:#fff;
+    }
+
+    .checked .checkbox-box{
+      background:#2fb344;
+      border-color:#2fb344;
+    }
+
+    .legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-top:12px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(255,255,255,.95);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+
     .overlay.active{display:flex}
-    .card{width:min(420px,100%);background:#fff;border:1px solid #e5e7eb;border-radius:18px;box-shadow:var(--shadow);padding:20px}
-    .card h1{margin:0 0 8px;font-size:24px}
-    .choices{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-    button{border:0;border-radius:12px;padding:11px 14px;font:inherit;cursor:pointer}
-    .primary{background:var(--header);color:#fff}
-    .secondary{background:#e8f2ff;color:#0f4fa8}
-    .confirm{background:var(--teal);color:#fff}
-    .toast{position:fixed;right:16px;bottom:16px;background:#1f2937;color:#fff;padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);display:none;z-index:60;font-size:14px}
+
+    .modal{
+      width:min(460px,100%);
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+
+    .modal h1{
+      margin:0 0 8px;
+      font-size:26px;
+    }
+
+    .modal p{margin:0;color:var(--muted)}
+    .choices{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .name-row{
+      display:flex;
+      gap:10px;
+      align-items:end;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .toast{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      background:#111827;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      display:none;
+      z-index:60;
+      box-shadow:var(--shadow);
+      font-size:14px;
+    }
     .toast.show{display:block}
-    .name-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+
+    @media (max-width: 1200px){
+      .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
     @media (max-width: 900px){
-      .layout{grid-template-columns:1fr}
-      .sidebar{order:2}
+      .dashboard-grid{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+
+    @media (max-width: 640px){
+      .topbar{padding:14px 16px}
+      .wrap{padding:0 12px 20px}
+      .metrics{grid-template-columns:1fr}
+      .filter-left,.filter-right{width:100%}
+      .rowhdr{min-width:140px}
+      .corner{min-width:140px}
     }
   </style>
 </head>
 <body>
   <div class="topbar">
-    <div class="title">Shared Attendance Manager</div>
-    <div class="user" id="userInfo">Logged in as: —</div>
+    <div class="brand">Attendance Dashboard</div>
+    <div class="user-info" id="userInfo">Logged in as: —</div>
+    <div class="spacer"></div>
     <a href="#" class="switch-link" id="switchRoleLink">Switch role</a>
   </div>
 
   <div class="wrap">
-    <div class="layout">
-      <section class="panel">
-        <div class="panel-inner">
-          <div class="controls">
-            <div class="field">
-              <label for="monthSelect">Month</label>
-              <select id="monthSelect"></select>
+    <div class="dashboard-grid">
+      <div class="main-col">
+
+        <section class="metrics">
+          <div class="metric">
+            <div class="label">Total Members</div>
+            <div class="value" id="mTotal">0</div>
+            <div class="sub">Employees in system</div>
+          </div>
+          <div class="metric">
+            <div class="label">Marked This Month</div>
+            <div class="value" id="mMonth">0</div>
+            <div class="sub">All checked days</div>
+          </div>
+          <div class="metric">
+            <div class="label">Year Total Marked</div>
+            <div class="value" id="mYear">0</div>
+            <div class="sub">All months in selected year</div>
+          </div>
+          <div class="metric">
+            <div class="label">Defaulters</div>
+            <div class="value" id="mDef">0</div>
+            <div class="sub">Fewer than 20 days</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-inner">
+            <div class="filters">
+              <div class="filter-left">
+                <div class="field">
+                  <label for="monthSelect">Month</label>
+                  <select id="monthSelect"></select>
+                </div>
+                <div class="field">
+                  <label for="yearInput">Year</label>
+                  <input id="yearInput" type="number" min="2000" max="2100" />
+                </div>
+              </div>
+              <div class="filter-right">
+                <button class="btn btn-soft" id="refreshBtn">Refresh</button>
+              </div>
             </div>
-            <div class="field">
-              <label for="yearInput">Year</label>
-              <input id="yearInput" type="number" min="2000" max="2100" />
+          </div>
+        </section>
+
+        <section class="card attendance-card">
+          <div class="card-inner">
+            <div class="grid-wrap">
+              <div id="grid" class="attendance-grid"></div>
+            </div>
+            <div class="legend">
+              <span><span class="checkbox-box"></span> empty = absent</span>
+              <span><span class="checkbox-box checked" style="display:inline-flex"></span> checked = marked</span>
             </div>
           </div>
-          <div class="grid-wrap">
-            <div id="grid" class="attendance-grid"></div>
-          </div>
-          <div class="legend">
-            <span><i class="status-dot" style="background:#f4c542"></i> yellow = pending</span>
-            <span><i class="status-dot" style="background:#34a853"></i> green = verified</span>
-            <span><i class="status-dot" style="background:#c7c7c7"></i> gray = absent</span>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <aside class="sidebar">
-        <h2>Defaulters this month</h2>
-        <div class="sidebar-inner">
-          <div id="defaulters" class="badge-list"></div>
+        <div class="sidebar-head">
+          <h2>Defaulters this month</h2>
+        </div>
+        <div class="sidebar-body">
+          <div id="defaulters" class="pill-list"></div>
         </div>
       </aside>
     </div>
   </div>
 
   <div class="overlay" id="roleOverlay">
-    <div class="card">
+    <div class="modal">
       <h1>Choose your role</h1>
-      <p class="muted">This is saved on your device only.</p>
+      <p>This is saved on your device only.</p>
       <div class="choices">
-        <button class="primary" id="managerBtn">I am Manager</button>
-        <button class="secondary" id="employeeBtn">I am Employee</button>
+        <button class="btn btn-primary" id="managerBtn">I am Manager</button>
+        <button class="btn btn-soft" id="employeeBtn">I am Employee</button>
       </div>
-      <div id="namePrompt" style="display:none;margin-top:18px">
+      <div id="employeeSetup" style="display:none">
         <div class="name-row">
           <div class="field" style="flex:1;min-width:220px">
-            <label for="employeeNameInput">Employee name</label>
-            <input id="employeeNameInput" type="text" placeholder="Enter your name" />
+            <label for="employeeNameSelect">Select your name</label>
+            <select id="employeeNameSelect"></select>
           </div>
-          <button class="confirm" id="nameConfirmBtn">Confirm</button>
+          <button class="btn btn-teal" id="nameConfirmBtn">Continue</button>
         </div>
       </div>
     </div>
@@ -145,21 +506,22 @@
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
     const state = {
       role: null,
       name: null,
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
-      data: [],
-      employees: []
+      employees: [],
+      attendance: []
     };
 
     const els = {
       roleOverlay: document.getElementById('roleOverlay'),
       managerBtn: document.getElementById('managerBtn'),
       employeeBtn: document.getElementById('employeeBtn'),
-      namePrompt: document.getElementById('namePrompt'),
-      employeeNameInput: document.getElementById('employeeNameInput'),
+      employeeSetup: document.getElementById('employeeSetup'),
+      employeeNameSelect: document.getElementById('employeeNameSelect'),
       nameConfirmBtn: document.getElementById('nameConfirmBtn'),
       switchRoleLink: document.getElementById('switchRoleLink'),
       userInfo: document.getElementById('userInfo'),
@@ -167,25 +529,20 @@
       yearInput: document.getElementById('yearInput'),
       grid: document.getElementById('grid'),
       defaulters: document.getElementById('defaulters'),
-      toast: document.getElementById('toast')
+      toast: document.getElementById('toast'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      mTotal: document.getElementById('mTotal'),
+      mMonth: document.getElementById('mMonth'),
+      mYear: document.getElementById('mYear'),
+      mDef: document.getElementById('mDef')
     };
 
     function safeLocalGet(k){ try { return localStorage.getItem(k); } catch { return null; } }
     function safeLocalSet(k,v){ try { localStorage.setItem(k,v); } catch {} }
     function safeLocalRemove(k){ try { localStorage.removeItem(k); } catch {} }
+    function showToast(){ els.toast.classList.add('show'); clearTimeout(showToast.t); showToast.t = setTimeout(()=>els.toast.classList.remove('show'), 2200); }
 
-    function showToast(){
-      els.toast.classList.add('show');
-      clearTimeout(showToast.t);
-      showToast.t = setTimeout(()=>els.toast.classList.remove('show'), 2200);
-    }
-
-    function keyYearMonth(y,m){ return `${y}-${String(m).padStart(2,'0')}`; }
-
-    function openRoleScreen(){
-      els.roleOverlay.classList.add('active');
-      els.namePrompt.style.display = 'none';
-    }
+    function openRoleScreen(){ els.roleOverlay.classList.add('active'); els.employeeSetup.style.display = 'none'; }
     function closeRoleScreen(){ els.roleOverlay.classList.remove('active'); }
 
     function initMonthYear(){
@@ -194,12 +551,35 @@
       els.yearInput.value = String(state.year);
     }
 
+    function daysInMonth(year, month){ return new Date(year, month, 0).getDate(); }
+
+    function loadIdentity(){
+      state.role = safeLocalGet('attendance_role');
+      state.name = safeLocalGet('attendance_name');
+    }
+
+    function saveIdentity(){
+      safeLocalSet('attendance_role', state.role || '');
+      safeLocalSet('attendance_name', state.name || '');
+    }
+
+    async function ensureEmployeeExists(name){
+      try{
+        const { error } = await sb.from('employees').upsert({ name }, { onConflict: 'name' });
+        if (error) throw error;
+      } catch (e) {
+        console.error(e);
+        showToast();
+      }
+    }
+
     async function loadEmployees(){
       try{
         const { data, error } = await sb.from('employees').select('name').order('name', { ascending: true });
         if (error) throw error;
         state.employees = (data || []).map(x => x.name);
-      } catch (e){
+      } catch (e) {
+        console.error(e);
         showToast();
       }
     }
@@ -208,33 +588,19 @@
       try{
         const { data, error } = await sb
           .from('attendance')
-          .select('employee_name, day, status')
+          .select('employee_name, day, year, month')
           .eq('year', state.year)
           .eq('month', state.month);
         if (error) throw error;
-        state.data = data || [];
-      } catch (e){
+        state.attendance = data || [];
+      } catch (e) {
+        console.error(e);
         showToast();
       }
     }
 
-    async function ensureEmployeeExists(name){
-      if (!name) return;
-      try{
-        const { error } = await sb.from('employees').upsert({ name }, { onConflict: 'name' });
-        if (error) throw error;
-      } catch (e){
-        showToast();
-      }
-    }
-
-    function daysInMonth(year, month){
-      return new Date(year, month, 0).getDate();
-    }
-
-    function getStatus(name, day){
-      const found = state.data.find(r => r.employee_name === name && Number(r.day) === Number(day));
-      return found ? found.status : '';
+    function getChecked(name, day){
+      return state.attendance.some(r => r.employee_name === name && Number(r.day) === Number(day));
     }
 
     function visibleEmployees(){
@@ -242,43 +608,36 @@
       return state.employees;
     }
 
-    function render(){
-      els.userInfo.textContent = `Logged in as: ${state.name || '—'} (${state.role || '—'})`;
+    function computeMetrics(){
+      const totalMembers = state.employees.length;
+      const yearCounts = {};
+      const monthCounts = {};
 
-      const dim = daysInMonth(state.year, state.month);
-      const names = visibleEmployees().filter(Boolean);
-      els.grid.style.gridTemplateColumns = `160px repeat(${dim}, 34px)`;
-
-      let html = `<div class="corner colhdr">Employee</div>`;
-      for (let d = 1; d <= dim; d++) html += `<div class="colhdr">${d}</div>`;
-
-      for (const name of names){
-        html += `<div class="rowhdr">${name}</div>`;
-        for (let d = 1; d <= dim; d++){
-          const status = getStatus(name, d);
-          const cls = status === 'verified' ? 'verified' : status === 'marked' ? 'pending' : 'absent';
-          html += `
-            <div class="cell ${cls}" data-name="${encodeURIComponent(name)}" data-day="${d}" title="${name} - ${d}">
-              <span class="status-dot"></span>
-            </div>`;
-        }
+      for (const row of state.attendance){
+        yearCounts[row.employee_name] = (yearCounts[row.employee_name] || 0) + 1;
+        monthCounts[row.employee_name] = (monthCounts[row.employee_name] || 0) + 1;
       }
 
-      els.grid.innerHTML = html;
-      renderDefaulters();
+      const monthMarked = state.attendance.length;
+      const yearMarked = Object.values(yearCounts).reduce((a,b)=>a+b,0);
+      const defaultersCount = state.employees.filter(name => (monthCounts[name] || 0) < 20).length;
+
+      els.mTotal.textContent = totalMembers;
+      els.mMonth.textContent = monthMarked;
+      els.mYear.textContent = yearMarked;
+      els.mDef.textContent = defaultersCount;
     }
 
     function renderDefaulters(){
       const counts = {};
-      for (const row of state.data){
-        if (!counts[row.employee_name]) counts[row.employee_name] = 0;
-        if (row.status === 'marked' || row.status === 'verified') counts[row.employee_name]++;
+      for (const row of state.attendance){
+        counts[row.employee_name] = (counts[row.employee_name] || 0) + 1;
       }
 
-      const list = Object.entries(counts)
-        .filter(([_, count]) => count < 20)
-        .map(([name, count]) => ({ name, count }))
-        .sort((a,b) => a.name.localeCompare(b.name));
+      const list = state.employees
+        .map(name => ({ name, count: counts[name] || 0 }))
+        .filter(x => x.count < 20)
+        .sort((a,b)=>a.name.localeCompare(b.name));
 
       if (!list.length){
         els.defaulters.innerHTML = `<div class="muted">No defaulters this month 🎉</div>`;
@@ -293,13 +652,50 @@
       `).join('');
     }
 
+    function renderEmployeeDropdown(){
+      els.employeeNameSelect.innerHTML = state.employees.map(name => `<option value="${name}">${name}</option>`).join('');
+    }
+
+    function renderGrid(){
+      const days = daysInMonth(state.year, state.month);
+      const names = visibleEmployees().filter(Boolean);
+
+      els.grid.style.gridTemplateColumns = `170px repeat(${days}, 34px)`;
+
+      let html = `<div class="corner colhdr">Employee</div>`;
+      for (let d = 1; d <= days; d++) html += `<div class="colhdr">${d}</div>`;
+
+      for (const name of names){
+        html += `<div class="rowhdr">${name}</div>`;
+        for (let d = 1; d <= days; d++){
+          const checked = getChecked(name, d);
+          html += `
+            <div class="cell ${checked ? 'checked' : 'absent'}" data-name="${encodeURIComponent(name)}" data-day="${d}">
+              <div class="checkbox-box">${checked ? '✓' : ''}</div>
+            </div>
+          `;
+        }
+      }
+
+      els.grid.innerHTML = html;
+    }
+
+    function renderAll(){
+      els.userInfo.textContent = `Logged in as: ${state.name || '—'} (${state.role || '—'})`;
+      renderGrid();
+      renderDefaulters();
+      computeMetrics();
+    }
+
     async function refresh(){
       try{
         await Promise.all([loadEmployees(), loadAttendance()]);
         if (state.role === 'Employee' && state.name) await ensureEmployeeExists(state.name);
         await loadEmployees();
-        render();
-      } catch (e){
+        renderEmployeeDropdown();
+        renderAll();
+      } catch (e) {
+        console.error(e);
         showToast();
       }
     }
@@ -310,69 +706,42 @@
 
       const name = decodeURIComponent(cell.dataset.name);
       const day = Number(cell.dataset.day);
-      const current = getStatus(name, day);
+
+      if (state.role === 'Employee' && name !== state.name) return;
 
       try{
-        if (state.role === 'Manager'){
-          if (current === 'marked'){
-            await sb.from('attendance')
-              .upsert({
-                year: state.year,
-                month: state.month,
-                employee_name: name,
-                day,
-                status: 'verified',
-                updated_at: new Date().toISOString()
-              }, { onConflict: 'year,month,employee_name,day' });
-          } else if (current === 'verified'){
-            await sb.from('attendance')
-              .upsert({
-                year: state.year,
-                month: state.month,
-                employee_name: name,
-                day,
-                status: 'marked',
-                updated_at: new Date().toISOString()
-              }, { onConflict: 'year,month,employee_name,day' });
-          }
+        const checked = getChecked(name, day);
+
+        if (checked){
+          const { error } = await sb.from('attendance')
+            .delete()
+            .eq('year', state.year)
+            .eq('month', state.month)
+            .eq('employee_name', name)
+            .eq('day', day);
+          if (error) throw error;
         } else {
-          if (name !== state.name) return;
-          if (current){
-            await sb.from('attendance')
-              .delete()
-              .eq('year', state.year)
-              .eq('month', state.month)
-              .eq('employee_name', name)
-              .eq('day', day);
-          } else {
-            await sb.from('attendance')
-              .upsert({
-                year: state.year,
-                month: state.month,
-                employee_name: name,
-                day,
-                status: 'marked',
-                updated_at: new Date().toISOString()
-              }, { onConflict: 'year,month,employee_name,day' });
-          }
+          const { error } = await sb.from('attendance').insert({
+            year: state.year,
+            month: state.month,
+            employee_name: name,
+            day
+          });
+          if (error) throw error;
         }
+
         await refresh();
-      } catch (e){
+      } catch (e) {
+        console.error(e);
         showToast();
       }
     }
 
-    els.monthSelect.addEventListener('change', async () => {
-      state.month = Number(els.monthSelect.value);
-      await refresh();
-    });
-
-    els.yearInput.addEventListener('change', async () => {
-      state.year = Number(els.yearInput.value || new Date().getFullYear());
-      await refresh();
-    });
-
     els.grid.addEventListener('click', onCellClick);
+
+    els.monthSelect.addEventListener('change', async () => { state.month = Number(els.monthSelect.value); await refresh(); });
+    els.yearInput.addEventListener('change', async () => { state.year = Number(els.yearInput.value || new Date().getFullYear()); await refresh(); });
+    els.refreshBtn.addEventListener('click', refresh);
 
     els.switchRoleLink.addEventListener('click', (e) => {
       e.preventDefault();
@@ -381,43 +750,32 @@
       state.role = null;
       state.name = null;
       openRoleScreen();
-      render();
+      renderAll();
     });
 
     els.managerBtn.addEventListener('click', async () => {
       state.role = 'Manager';
       state.name = 'Manager';
-      safeLocalSet('attendance_role', state.role);
-      safeLocalSet('attendance_name', state.name);
+      saveIdentity();
       closeRoleScreen();
       await refresh();
     });
 
     els.employeeBtn.addEventListener('click', () => {
-      els.namePrompt.style.display = 'block';
-      els.employeeNameInput.focus();
+      els.employeeSetup.style.display = 'block';
+      renderEmployeeDropdown();
     });
 
     els.nameConfirmBtn.addEventListener('click', async () => {
-      const name = els.employeeNameInput.value.trim();
+      const name = els.employeeNameSelect.value;
       if (!name) return;
       state.role = 'Employee';
       state.name = name;
-      safeLocalSet('attendance_role', state.role);
-      safeLocalSet('attendance_name', state.name);
+      saveIdentity();
       await ensureEmployeeExists(name);
       closeRoleScreen();
       await refresh();
     });
-
-    els.employeeNameInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') els.nameConfirmBtn.click();
-    });
-
-    function loadIdentity(){
-      state.role = safeLocalGet('attendance_role');
-      state.name = safeLocalGet('attendance_name');
-    }
 
     async function boot(){
       loadIdentity();
@@ -426,9 +784,12 @@
       if (!state.role || !state.name){
         openRoleScreen();
       } else {
-        await refresh();
+        if (state.role === 'Employee' && state.name) {
+          await ensureEmployeeExists(state.name);
+        }
       }
 
+      await refresh();
       setInterval(refresh, 5000);
     }
 
